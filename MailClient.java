@@ -8,9 +8,14 @@
 public class MailClient
 {
     // instance variables 
-    private MailServer server;//server asociated with the client
-    private String user; //user server´s adress
-    private MailItem items;// the last message
+    //server asociated with the client
+    private MailServer server;
+    //user server´s adress
+    private String user;
+    // the last message
+    private MailItem items;
+    //para el spam
+    private boolean spam;
     /**
      * Constructor for objects of class MailClient with parametres server and user
      */
@@ -29,11 +34,27 @@ public class MailClient
     public MailItem getNexMailItem()
     {
         MailItem item = server.getNextMailItem (user);
-        if(items != null)
+        if(item== null)
         {
-            items = item;
+            spam =false;
+            return item;
         }
-        return items;
+        else if (item.getMessage().contains("trabajo")){
+            spam=false;
+            return item;
+        }
+
+        else if((item.getMessage().contains("promocion"))|| (item.getMessage().contains("regalo"))){
+            spam = true;
+            item = null;
+            return null;
+
+        }
+
+        else{
+            spam=false;
+            return items;
+        }
 
     }
 
@@ -55,19 +76,18 @@ public class MailClient
     {
         MailItem item = server.getNextMailItem (user);
         if(item == null) {
-            System.out.println("No new mail.");
+            if (spam == true){
+                System.out.println("spam");
+            }
+            else{
+                System.out.println("No new mail.");  
+            }
         }
         else {
-            if (item.getMessage().contains("trabajo")){
-                item.print();
-            }
-            else if((item.getMessage().contains("promocion"))|| (item.getMessage().contains("regalo"))){
-                System.out.println("Spam");
 
-            }
-            
+            item.print();
         }
-        
+
     }
 
     /**
@@ -98,17 +118,15 @@ public class MailClient
 
         if (item == null)
         {
-            System.out.println ("No new mail."); //si quisiera una línea sin salto de linea System.out.print();
+
+            System.out.println ("No new email");
         }
+
         else
         {   
-            // \n salta a una nueva línea
-            // \t introduce un tabulador
 
             sendMailItem (item.getFrom(),"Re"  + item.getSubject(),"No estoy en la oficina.\n\t" + item.getMessage() );
-
         }
-
     }
 
     /**
