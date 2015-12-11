@@ -19,46 +19,58 @@ public class MailClient
         // initialise instance variables server and user 
         this.server = server;
         this.user = user;
-        
+        this.items = items;//yo no lo  inciciaría
     }
 
     /**
      * A method call getNextMailItem that recover of the server the objet user and return it.
-     * 
+     * no cambiastes este método
      */
     public MailItem getNexMailItem()
     {
-        
-        return server.getNextMailItem (user);
-        
+        MailItem item = server.getNextMailItem (user);
+        if(items != null)
+        {
+            items = item;
+        }
+        return items;
+
     }
+
     /**
      * A method call ShowMailItem that show the messages in the server.
      * 
      */
     public void showMailItem()
     {
-        
+
         System.out.println( "Tiene usted " + server.howManyMailItems (user) + " mensajes");
     }
+
     /**
      * A method call printtNextMailItem that recover of the server the next mail and return it.
      * 
      */
-    public MailItem printNexMailItem()
+    public void printNexMailItem()
     {
         MailItem item = server.getNextMailItem (user);
-        if (item == null)
-        {
-            System.out.println ("No new mail.");
+        if(item == null) {
+            System.out.println("No new mail.");
         }
-        else
-        {
-            item.print ();
+        else {
+            if (item.getMessage().contains("trabajo")){
+                item.print();
+            }
+            else if((item.getMessage().contains("promocion"))|| (item.getMessage().contains("regalo"))){
+                System.out.println("Spam");
+
+            }
+            
         }
-        return server.getNextMailItem (user);
+        
     }
-      /**
+
+    /**
      * A method call printLastMailItem that show the last mail.
      * 
      */
@@ -75,6 +87,7 @@ public class MailClient
         }
 
     }
+
     /**
      * A method call getNextMailItemAndAutorespond that recover of the server the next mail and return other different ("No estoy en la oficina"),
      * the same message has  the prefix "Re" too.
@@ -85,18 +98,19 @@ public class MailClient
 
         if (item == null)
         {
-           System.out.println ("No new mail."); //si quisiera una línea sin salto de linea System.out.print();
+            System.out.println ("No new mail."); //si quisiera una línea sin salto de linea System.out.print();
         }
         else
         {   
-             // \n salta a una nueva línea
-             // \t introduce un tabulador
-             
-             sendMailItem (item.getFrom(),"Re"  + item.getSubject(),"No estoy en la oficina.\n\t" + item.getMessage() );
-             
+            // \n salta a una nueva línea
+            // \t introduce un tabulador
+
+            sendMailItem (item.getFrom(),"Re"  + item.getSubject(),"No estoy en la oficina.\n\t" + item.getMessage() );
+
         }
-         
+
     }
+
     /**
      * A method call sendMailItem that have two String parametres to and message, creates an email (MailItem object)
      *with those parametres and sends to served asociate with these client.
@@ -107,4 +121,5 @@ public class MailClient
         MailItem item = new MailItem (user,to, message, subject);
         server.post (item); //send to server with method post
     }
+
 }
